@@ -26,7 +26,7 @@ const orderSchema = new Schema({
         default: 'pending'
     },
     selectedAddress: {
-        type: [Schema.Types.Mixed],
+        type: Schema.Types.Mixed,
         required: true
     }
 })
