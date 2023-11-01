@@ -7,3 +7,13 @@ exports.isAuth = (req, res, done) => {
 exports.sanitizeUser = (user) => {
     return { id: user.id, role: user.role }
 }
+
+exports.cookieExtractor = function (req) {
+    var token = null;
+    if (req && req.cookies) {
+        token = req.cookies['jwt'];
+    }
+    //this is temporary token for testing without cookie
+    token = ''
+    return token;
+}

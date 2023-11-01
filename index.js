@@ -11,6 +11,7 @@ const crypto = require('crypto');
 const jwt = require('jsonwebtoken');
 const JwtStrategy = require('passport-jwt').Strategy;
 const ExtractJwt = require('passport-jwt').ExtractJwt;
+const cookieParser = require('cookie-parser');
 const { createProduct } = require('./controller/Product');
 const productsRouter = require('./routes/Products');
 const categoriesRouter = require('./routes/Category');
@@ -20,17 +21,20 @@ const authRouter = require('./routes/Auth');
 const cartRouter = require('./routes/Cart');
 const ordersRouter = require('./routes/Order');
 const { User } = require('./model/User');
-const { isAuth, sanitizeUser } = require('./services/common');
+const { isAuth, sanitizeUser, cookieExtractor } = require('./services/common');
 
 const SECRET_KEY = process.env.JWT_SECRET_KEY;
 const PORT = process.env.PORT;
 
+
 //JWT options
 const opts = {}
-opts.jwtFromRequest = ExtractJwt.fromAuthHeaderAsBearerToken()
+opts.jwtFromRequest = cookieExtractor;
 opts.secretOrKey = SECRET_KEY;
 
 //middlewares
+// server.use(express.static('build'))
+server.use(cookieParser());
 server.use(session({
     secret: 'keyboard cat',
     resave: false, // don't save session if unmodified
@@ -72,7 +76,7 @@ passport.use('local', new LocalStrategy(
                         return done(null, false, { message: 'invalid credentials' })
                     }
                     const token = jwt.sign(sanitizeUser(user), SECRET_KEY);
-                    done(null, token)
+                    done(null, { token }) //this line sends to serializer
                 })
         }
         catch (err) {
@@ -83,7 +87,7 @@ passport.use('local', new LocalStrategy(
 
 passport.use('jwt', new JwtStrategy(opts, async function (jwt_payload, done) {
     try {
-        const user = await User.findOne({ id: jwt_payload.sub })
+        const user = await User.findById(jwt_payload.id)
         if (user) {
             return done(null, sanitizeUser(user));
         }
