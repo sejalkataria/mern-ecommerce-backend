@@ -76,7 +76,7 @@ passport.use('local', new LocalStrategy(
                         return done(null, false, { message: 'invalid credentials' })
                     }
                     const token = jwt.sign(sanitizeUser(user), SECRET_KEY);
-                    done(null, { token }) //this line sends to serializer
+                    done(null, { id: user.id, role: user.role }) //this line sends to serializer
                 })
         }
         catch (err) {

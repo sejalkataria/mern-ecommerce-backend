@@ -14,6 +14,9 @@ exports.cookieExtractor = function (req) {
         token = req.cookies['jwt'];
     }
     //this is temporary token for testing without cookie
-    token = ''
+    //admin
+    // token = process.env.TOKEN_ADMIN
+    //demo
+    token = process.env.TOKEN_DEMO
     return token;
 }
